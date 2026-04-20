@@ -489,6 +489,69 @@ footer{
 .reveal.visible{opacity:1;transform:none}
 .reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}.reveal-d3{transition-delay:.3s}
 
+/* ── ENQUIRY MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;z-index:9990;
+  background:rgba(0,0,0,.85);
+  backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  opacity:0;pointer-events:none;
+  transition:opacity .4s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{
+  background:var(--off-black);
+  border:1px solid rgba(255,255,255,.1);
+  padding:56px 52px;
+  width:100%;max-width:600px;
+  position:relative;
+  transform:translateY(32px);
+  transition:transform .4s cubic-bezier(.16,1,.3,1);
+}
+.modal-overlay.open .modal-box{transform:translateY(0)}
+.modal-close{
+  position:absolute;top:24px;right:28px;
+  background:none;border:none;
+  color:rgba(255,255,255,.4);font-size:16px;
+  cursor:none;transition:color .2s;font-family:var(--mono);
+}
+.modal-close:hover{color:var(--white)}
+.modal-eyebrow{
+  font-family:var(--mono);font-size:9px;letter-spacing:.35em;text-transform:uppercase;
+  color:var(--mid);margin-bottom:12px;
+}
+.modal-title{
+  font-family:var(--display);font-size:clamp(32px,4vw,52px);
+  color:var(--white);line-height:.9;margin-bottom:40px;letter-spacing:.02em;
+}
+.mf-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.mf-field{display:flex;flex-direction:column;gap:7px;margin-bottom:24px}
+.mf-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--mid);
+}
+.mf-field input,.mf-field textarea,.mf-field select{
+  background:rgba(255,255,255,.04);
+  border:none;border-bottom:1px solid rgba(255,255,255,.15);
+  color:var(--white);font-family:var(--serif);font-size:16px;
+  padding:12px 0;outline:none;
+  transition:border-color .3s;
+  appearance:none;border-radius:0;
+}
+.mf-field input::placeholder,.mf-field textarea::placeholder{color:rgba(255,255,255,.2)}
+.mf-field select option{background:var(--off-black)}
+.mf-field input:focus,.mf-field textarea:focus,.mf-field select:focus{border-bottom-color:var(--white)}
+.mf-field textarea{resize:none}
+.mf-submit{
+  font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--black);background:var(--white);border:none;
+  padding:18px 0;cursor:none;transition:background .3s;margin-top:8px;
+  width:100%;
+}
+.mf-submit:hover{background:#ddd}
+.mf-submit.sent{background:#2d6a4f;color:var(--white)}
+
 /* TWEAKS PANEL */
 #tweaks-panel{
   position:fixed;bottom:20px;right:20px;
@@ -685,7 +748,7 @@ footer{
         Commercial fashion. Beauty. Editorial. Based in Accra — open to the world.
       </p>
       <div class="cta-actions reveal reveal-d2">
-        <a href="mailto:hello@duquephotography.com" class="cta-btn-primary">Book a Session</a>
+        <button onclick="openEnquiry()" class="cta-btn-primary">Book a Session</button>
         <a href="https://www.instagram.com/duque.quarshie/" target="_blank" class="cta-btn-ghost">View Instagram →</a>
       </div>
       <div class="cta-details reveal reveal-d3">
@@ -696,6 +759,48 @@ footer{
         <span class="cta-detail-item"><span class="cta-detail-label">Phone</span>+233 55 000 0000</span>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ENQUIRY MODAL -->
+<div id="enquiryModal" class="modal-overlay" onclick="if(event.target===this)closeEnquiry()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeEnquiry()">✕</button>
+    <div class="modal-eyebrow">Get In Touch</div>
+    <h3 class="modal-title">START A PROJECT</h3>
+    <form class="modal-form" onsubmit="submitEnquiry(event)">
+      <div class="mf-row">
+        <div class="mf-field">
+          <label class="mf-label">First Name</label>
+          <input type="text" placeholder="Your name" required/>
+        </div>
+        <div class="mf-field">
+          <label class="mf-label">Last Name</label>
+          <input type="text" placeholder="Your surname"/>
+        </div>
+      </div>
+      <div class="mf-field">
+        <label class="mf-label">Email</label>
+        <input type="email" placeholder="hello@email.com" required/>
+      </div>
+      <div class="mf-field">
+        <label class="mf-label">Session Type</label>
+        <select>
+          <option value="">— Select —</option>
+          <option>Fashion / Editorial</option>
+          <option>Beauty</option>
+          <option>Commercial / Brand</option>
+          <option>Portrait</option>
+          <option>Wedding</option>
+          <option>Other Inquiry</option>
+        </select>
+      </div>
+      <div class="mf-field">
+        <label class="mf-label">Tell Me About Your Vision</label>
+        <textarea placeholder="Describe what you have in mind…" rows="4"></textarea>
+      </div>
+      <button type="submit" class="mf-submit" id="mfSubmit">Send Inquiry →</button>
+    </form>
   </div>
 </div>
 
@@ -807,6 +912,24 @@ function goT(n) {
 }
 tdots.forEach(d => d.addEventListener('click', () => goT(+d.dataset.i)));
 setInterval(() => goT((ti + 1) % testis.length), 5500);
+
+// ── ENQUIRY MODAL ──
+function openEnquiry(){
+  document.getElementById('enquiryModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeEnquiry(){
+  document.getElementById('enquiryModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function submitEnquiry(e){
+  e.preventDefault();
+  const btn=document.getElementById('mfSubmit');
+  btn.textContent='Sent ✓';
+  btn.classList.add('sent');
+  setTimeout(()=>{closeEnquiry();btn.textContent='Send Inquiry →';btn.classList.remove('sent');e.target.reset();},2500);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeEnquiry()});
 
 // ── CTA BUTTONS ──
 document.querySelectorAll('.cta-btn-primary,.cta-btn-ghost').forEach(el=>{
